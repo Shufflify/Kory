@@ -1,4 +1,4 @@
-# Project Name
+# Shufflify
 
 The project description
 
@@ -15,8 +15,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 1. [Usage](#Usage)
 1. [Requirements](#requirements)
 1. [Development](#development)
-    1. [Installing Dependencies](#installing-dependencies)
-    1. [Tasks](#tasks)
+    1. npm install
+    2. npm run redis-server
+    3. npm run elasticsearch from project root
 
 ## Usage
 
@@ -26,8 +27,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 
 - Node 6.9.x
 - Redis 3.2.x
-- Postgresql 9.6.x
-- etc
+- 
 
 ## Other Information
 

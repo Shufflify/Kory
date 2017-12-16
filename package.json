@@ -1,0 +1,33 @@
+{
+  "name": "shufflify",
+  "version": "1.0.0",
+  "description": "The project description",
+  "main": "index.js",
+  "scripts": {
+    "server": "nodemon server/index.js",
+    "elasticsearch": "./elasticsearch-6.1.0/bin/elasticsearch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shufflify/Kory.git"
+  },
+  "author": "kory",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Shufflify/Kory/issues"
+  },
+  "homepage": "https://github.com/Shufflify/Kory#readme",
+  "dependencies": {
+    "axios": "^0.17.1",
+    "elasticsearch": "^14.0.0",
+    "express": "^4.16.2",
+    "faker": "^4.1.0",
+    "fs-extra": "^5.0.0",
+    "redis": "^2.8.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "eslint": "^4.13.1",
+    "mocha": "^4.0.1"
+  }
+}
