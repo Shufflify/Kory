@@ -5,28 +5,31 @@ const client = new elasticsearch.Client({
   log: 'trace'
 });
 
-client.ping({
-  // ping usually has a 3000ms timeout
-  requestTimeout: 15000
-}, err => {
-  if (err) {
-    console.error('elasticsearch cluster is down!');
-  } else {
-    console.log('All is well');
-  }
-});
-
-// // create the ___ index
-// // 1 index with different posts or playlist idx, song idx ???
-// client.indices.create({ 
-//   index: 'playlists' // or just one index with diff posts?
-// }, (err, resp, status) => {
+// client.ping({
+//   // ping usually has a 3000ms timeout
+//   requestTimeout: 15000
+// }, err => {
 //   if (err) {
-//     console.log(err);
+//     console.error('elasticsearch cluster is down!');
 //   } else {
-//     console.log('create', resp);
+//     console.log('All is well');
 //   }
 // });
+
+
+// create the ___ index
+// 1 index with different posts or playlist idx, song idx ???
+const indices = ['playlists', 'songs'];
+for (index of indices) {
+  // check if index already exists
+  client.indices.create({ index }, (err, resp, status) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log('create', resp);
+    }
+  });
+}
 
 // client.search({
 //   q: 'bo burnham'
@@ -58,9 +61,9 @@ client.ping({
 //     console.trace(err.message);
 // });
 
-// // prevent 404 responses from being considered errors by telling client to ignore
+// prevent 404 responses from being considered errors by telling client to ignore
 // client.indices.delete({
-//   index: 'test_index',
+//   index: 'playlists',
 //   ignore: [404]
 // }).then(function (body) {
 //   // since we told the client to ignore 404 errors, the
@@ -73,3 +76,4 @@ client.ping({
 // // Use wildcard searches and regular expressions.
 // // query for all matches where ‘.js’ is preceded by four characters:
 // query: { wildcard: { "PostBody": "????.js" } }
+module.exports = client;
