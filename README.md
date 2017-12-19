@@ -18,6 +18,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
     1. npm install
     2. npm run redis-server
     3. npm run elasticsearch from project root
+    4. node faker/faker to generate fake data
 
 ## Usage
 

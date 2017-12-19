@@ -17,11 +17,10 @@ const client = new elasticsearch.Client({
 // });
 
 
-// create the ___ index
-// 1 index with different posts or playlist idx, song idx ???
+// create the playlists and songs indices
 const indices = ['playlists', 'songs'];
-for (index of indices) {
-  // check if index already exists
+const createIdx = index => {
+  // check if index already exists TODO
   client.indices.create({ index }, (err, resp, status) => {
     if (err) {
       console.log(err);
@@ -29,11 +28,11 @@ for (index of indices) {
       console.log('create', resp);
     }
   });
-}
+};
 
-// client.search({
-//   q: 'bo burnham'
-// }).then(body => {
+const basicSearch = q => client.search({ q });
+
+// .then(body => {
 //   const hits = body.hits.hits;
 // }, err => {
 //   console.trace(err.message);
@@ -76,4 +75,6 @@ for (index of indices) {
 // // Use wildcard searches and regular expressions.
 // // query for all matches where ‘.js’ is preceded by four characters:
 // query: { wildcard: { "PostBody": "????.js" } }
-module.exports = client;
+module.exports.basicSearch = basicSearch;
+module.exports.createIdx = createIdx;
+module.exports.client = client;
