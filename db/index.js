@@ -31,6 +31,26 @@ const createIdx = index => {
 };
 
 const basicSearch = q => client.search({ q });
+const getPlaylists = playlistIds => {
+  let playlists = [];
+  for (id of playlistIds) {
+    client.search({
+      index: 'playlists',
+      type: 'playlist',
+      body: {
+        query: {
+          match: {
+            'id': id
+          }
+        }
+      }
+    }).then(body => {
+      console.log(body);
+      // playlists.push(body) push playlist data to playlists
+    });
+  }
+  return playlists;
+};
 
 // .then(body => {
 //   const hits = body.hits.hits;
@@ -75,6 +95,7 @@ const basicSearch = q => client.search({ q });
 // // Use wildcard searches and regular expressions.
 // // query for all matches where ‘.js’ is preceded by four characters:
 // query: { wildcard: { "PostBody": "????.js" } }
+module.exports.getPlaylists = getPlaylists;
 module.exports.basicSearch = basicSearch;
 module.exports.createIdx = createIdx;
 module.exports.client = client;

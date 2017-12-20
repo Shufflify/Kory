@@ -9,47 +9,42 @@ const app = express();
 // on spotify open
 app.get('/playlists/:userId', (req, res) => {
   const { userId } = req.params;
-  let playlists = [];
-  // get playlist data from AM
-    .then(userPlaylists => playlists.concat(userPlaylists.userPlaylists))
-    .then(() => // get default playlists from redis cache)
-    .then(defaultPlaylists => res.json(playlists.concat(playlists)))
+  let userPlaylists = [];
+  // get user playlist data from AM
+    .then(playlists => userPlaylists.concat(playlists.userPlaylists))
+    .then(() => cache.getDefPlaylistIds()) // get default playlist ids from redis cache
+    .then(defPlaylistIds => db.getPlaylists())
+    .then(defaultPlaylists => res.json({ userPlaylists, defaultPlaylists }))
 });
 
 // on playlist click
-app.get('/playlists/:playlistId', (req, res) => {
+app.get('/playlists/:playlistId', cache.checkPlaylists(), (req, res) => {
   const { playlistId } = req.params;
-  cache.findPlaylist(playlistId)
-    .then(playlistData => {
-      // if (playlistData is a thing)
-        // return playlistData
-      // else 
-        // get playlist info from AM
-    })
-    .then(playlistData => {
-      // send SNS of songs to Streaming
-      // res.json(playlistData)
-    })
+  // TODO: update cache with clicked playlist info
+  if (req.songIds) {
+    // send SNS message containg req.songIds to Streaming
+  } else {
+    // send playlistId to AM => get playlist data from AM
+      .then(playlistData => {
+        // res.json(playlistData)
+      })
+  }
 });
 
 // on search
-app.get('/search/:userId/:query', (req, res) => {
+app.get('/search/:userId/:query', cache.checkQueries(), (req, res) => {
   const { userId, query } = req.params;
-  cache.findQuery(query)
-    .then(queryData => {
-      // if (queryData is a thing)
-        // return queryData
-      // else {
-        // return db.basicSearch(query)
-      // }
-    })
-    .then(queryData => {
-      res.json(queryData)
-      // for songs in queryData
-        // send SNS of top songIds to Streaming
-      // for playlists in queryData
-        // send SNS of playlist Ids to AM
-    })
-    .catch(err => console.error(err))
+  if (!req.queryResults) {
+    db.basicSearch(query)
+      .then(queryResults => {
+        req.queryResults = queryResults;
+        res.json(queryResults)
+      })
+      .catch(err => console.error(err))
+  }
+  // for songs in queryResults
+    // send SNS of top songIds to Streaming
+  // for playlists in queryResults
+    // send SNS of playlist Ids to AM
   // send SQS message to Events
 });
