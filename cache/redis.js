@@ -45,11 +45,18 @@ const getDefPlaylistIds = () => {
   });
 };
 
-const updateCache = id => {
+const updatePlaylistCache = playlistData => {
   // remove least recently used item from cache
   // add clicked playlist to cache
 };
 
+const updateQueryCache = queryData => {
+  // remove a query
+  // add queryData
+}
+
+module.exports.updatePlaylistCache = updatePlaylistCache;
+module.exports.updateQueryCache = updateQueryCache;
 module.exports.checkQueries = checkQueries;
 module.exports.getDefPlaylistIds = getDefPlaylistIds;
 module.exports.updateCache = updateCache;
