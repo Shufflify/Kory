@@ -19,7 +19,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
     2. npm run redis
     3. npm run elasticsearch
     4. npm run server
-    5. node faker/faker to generate fake data
+    5. npm run test
+    6. node faker/faker to generate fake data
 
 ## Usage
 

@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const AWS = require('aws-sdk');
 
 const db = require('../db');
 const cache = require('../cache');
@@ -20,7 +21,6 @@ app.get('/playlists/:userId', (req, res) => {
 // on playlist click
 app.get('/playlists/:playlistId', cache.checkPlaylists(), (req, res) => {
   const { playlistId } = req.params;
-  // TODO: update cache with clicked playlist info
   let playlist = {id: playlistId}
   if (req.songIds) {
     playlist.songs = req.songIDs;
@@ -38,20 +38,22 @@ app.get('/playlists/:playlistId', cache.checkPlaylists(), (req, res) => {
 // on search
 app.get('/search/:userId/:query', cache.checkQueries(), (req, res) => {
   const { userId, query } = req.params;
-  if (!req.queryResults) {
+  if (!req.queryData) {
     // TODO not sure if im using promise.resovle correctly
     Promise.resolve(db.basicSearch(query)
-      .then(queryResults => {
-        req.queryResults = queryResults;
-        res.json(queryResults);
+      .then(queryData => {
+        req.queryData = queryData;
+        res.json(queryData);
       })
       .catch(err => console.error(err)))
   }
   // ONCE THE ABOVE IS DONE:
-  // cache.updateQueryCache(req.queryResults)
-  // for songs in req.queryResults
+  // cache.updateQueryCache(req.queryData)
+  // for songs in req.queryData
     // send SNS of top songIds to Streaming
-  // for playlists in req.queryResults
+  // for playlists in req.queryData
     // send SNS of playlist Ids to AM
   // send SQS message to Events
 });
+
+module.exports.app = app;

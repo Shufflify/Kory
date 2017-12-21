@@ -28,14 +28,17 @@ const getPlaylists = playlistIds => {
       index: 'playlists',
       type: 'playlist',
       id: id
-    }).then((err, resp) => {
-      console.log(resp);
-      // playlists.push(body) push playlist data to playlists
+    }, (err, resp) => {
+      console.log('RESPONSE', resp);
+      playlists.push(resp._source)
+      console.log('FIRST PLAYLIST', playlists)
     });
   }
-  return playlists;
+  console.log('PLAYLISTS', playlists);
+  // return playlists;
 };
 
+getPlaylists([1])
 module.exports.getPlaylists = getPlaylists;
 module.exports.basicSearch = basicSearch;
 module.exports.createIdx = createIdx;
