@@ -21,15 +21,18 @@ app.get('/playlists/:userId', (req, res) => {
 app.get('/playlists/:playlistId', cache.checkPlaylists(), (req, res) => {
   const { playlistId } = req.params;
   // TODO: update cache with clicked playlist info
+  let playlist = {id: playlistId}
   if (req.songIds) {
-    // send SNS message containg req.songIds to Streaming
+    playlist.songs = req.songIDs;
+    // send SNS message containing req.songIds to Streaming
   } else {
     // send playlistId to AM => get playlist data from AM
       .then(playlistData => {
         // res.json(playlistData)
-        // cache.updatePlaylistCache(playlistData)
+        // playlist.songs = playlistData.songs
       })
   }
+  // cache.updatePlaylistCache(playlist)
 });
 
 // on search

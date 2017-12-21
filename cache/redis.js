@@ -24,12 +24,11 @@ const checkPlaylists = (req, res, next) => {
 
 const checkQueries = (req, res, next) => {
   const { query } = req.params;
-  req.foundQuery = false;
-  qClient.get(query, (err, queryResults) => {
+  qClient.get(query, (err, queryData) => {
     if (err) throw err;
-    if (queryResults !== null) {
-      req.queryResults = queryResults;
-      res.json(queryResults); // TODO check Formatting
+    if (queryData !== null) {
+      req.queryData = queryData;
+      res.json(queryData); // TODO check Formatting
     }
   }).then(() => next());
 };
@@ -45,15 +44,17 @@ const getDefPlaylistIds = () => {
   });
 };
 
-const updatePlaylistCache = playlistData => {
-  // remove least recently used item from cache
-  // add clicked playlist to cache
+const updatePlaylistCache = playlist => {
+  return Promise.resolve(pClient.hset('lruPlaylists', playlist.id, playlist.songIds))
+    .then(reply => console.log(reply))
+    .catch(err => console.error(err));
 };
 
 const updateQueryCache = queryData => {
-  // remove a query
-  // add queryData
-}
+  // add queryData to cache
+  // const { playlists, songs } = queryData.keyword
+  // qClient.hmset('keyword', queryData.keyword, playlists, songs )
+};
 
 module.exports.updatePlaylistCache = updatePlaylistCache;
 module.exports.updateQueryCache = updateQueryCache;

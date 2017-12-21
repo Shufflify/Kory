@@ -1,7 +1,8 @@
-const fs = require('fs-extra');
+// const fs = require('fs-extra');
 const faker = require('faker');
 
-const esClient = require('./index.js');
+const es = require('./index.js');
+const esClient = es.client;
 
 // instantiate song and playlist indices
 const indices = ['playlists', 'songs'];

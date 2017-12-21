@@ -5,16 +5,6 @@ const client = new elasticsearch.Client({
   log: 'trace'
 });
 
-// client.ping({
-//   // ping usually has a 3000ms timeout
-//   requestTimeout: 15000
-// }, err => {
-//   if (err) {
-//     console.error('elasticsearch cluster is down!');
-//   } else {
-//     console.log('All is well');
-//   }
-// });
 
 
 // create the playlists and songs indices
@@ -30,34 +20,42 @@ const createIdx = index => {
   });
 };
 
-const basicSearch = q => client.search({ q });
+const basicSearch = q => client.search({ q }).then(results => console.log(results));
 const getPlaylists = playlistIds => {
   let playlists = [];
   for (id of playlistIds) {
-    client.search({
+    client.get({
       index: 'playlists',
       type: 'playlist',
-      body: {
-        query: {
-          match: {
-            'id': id
-          }
-        }
-      }
-    }).then(body => {
-      console.log(body);
+      id: id
+    }).then((err, resp) => {
+      console.log(resp);
       // playlists.push(body) push playlist data to playlists
     });
   }
   return playlists;
 };
 
+module.exports.getPlaylists = getPlaylists;
+module.exports.basicSearch = basicSearch;
+module.exports.createIdx = createIdx;
+module.exports.client = client;
 // .then(body => {
 //   const hits = body.hits.hits;
 // }, err => {
 //   console.trace(err.message);
 
 
+// client.ping({
+//   // ping usually has a 3000ms timeout
+//   requestTimeout: 15000
+// }, err => {
+//   if (err) {
+//     console.error('elasticsearch cluster is down!');
+//   } else {
+//     console.log('All is well');
+//   }
+// });
 // // If you want to have a fine-grained control over document search, Elasticsearch offers a query DSL.
 // client.search({
 //     index: 'blog',
@@ -95,7 +93,3 @@ const getPlaylists = playlistIds => {
 // // Use wildcard searches and regular expressions.
 // // query for all matches where ‘.js’ is preceded by four characters:
 // query: { wildcard: { "PostBody": "????.js" } }
-module.exports.getPlaylists = getPlaylists;
-module.exports.basicSearch = basicSearch;
-module.exports.createIdx = createIdx;
-module.exports.client = client;

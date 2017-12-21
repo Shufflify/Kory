@@ -16,9 +16,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 1. [Requirements](#requirements)
 1. [Development](#development)
     1. npm install
-    2. npm run redis-server
-    3. npm run elasticsearch from project root
-    4. node faker/faker to generate fake data
+    2. npm run redis
+    3. npm run elasticsearch
+    4. npm run server
+    5. node faker/faker to generate fake data
 
 ## Usage
 
