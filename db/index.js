@@ -6,17 +6,19 @@ const client = new elasticsearch.Client({
 });
 
 // create the playlists and songs indices
-// const indices = ['playlists', 'songs'];
 const createIdx = index => {
-  // check if index already exists TODO
   client.indices.create({ index }, (err, resp, status) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('create', resp);
-    }
+    err ? console.error(err) : console.log('created', resp);
   });
 };
+
+const deleteIndices = indices => {
+  client.indices.delete({ index: indices }, (err, resp) => {
+    err ? console.error(err) : console.log('deleted', resp);
+  });
+};
+
+deleteIndices('*')
 
 const basicSearch = q => client.search({ q }).then(res => res.hits.hits);
 const getPlaylist = id => {
@@ -54,7 +56,7 @@ const formatResultsForUser = queryResults => {
 };
 // getPlaylists([8,4,5,6,33,5688]).then(res => console.log(res))
 // basicSearch('business').then(res => getIdsFromResults('business', res)).then(newRes => console.log(newRes));
-basicSearch('business').then(res => formatResultsForUser(res)).then(yea => console.log(yea))
+// basicSearch('business').then(res => formatResultsForUser(res)).then(yea => console.log(yea))
 
 module.exports.formatResultsForUser = formatResultsForUser;
 module.exports.getIdsFromResults = getIdsFromResults;
@@ -62,6 +64,7 @@ module.exports.getPlaylist = getPlaylist;
 module.exports.getPlaylists = getPlaylists;
 module.exports.basicSearch = basicSearch;
 module.exports.createIdx = createIdx;
+module.exports.deleteIndices = deleteIndices;
 module.exports.client = client;
 // .then(body => {
 //   const hits = body.hits.hits;

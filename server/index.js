@@ -38,20 +38,20 @@ app.get('/playlists/:playlistId', cache.checkPlaylists(), (req, res) => {
 // on search
 app.get('/search/:userId/:query', cache.checkQueries(), (req, res) => {
   const { userId, query } = req.params;
-  if (!req.queryData) {
+  if (!req.queryResults) {
     // TODO not sure if im using promise.resovle correctly
     Promise.resolve(db.basicSearch(query)
-      .then(searchResults => {
-        req.queryData = searchResults.hits.hits;
-        res.json(queryData);
-      })
-      .catch(err => console.error(err)))
+      .then(queryResults => req.queryResults = queryResults)
+      .then(() => db.formatResultsForUser(req.queryResults)
+      .then(formattedResults => res.json(formattedResults))
+      .catch(err => console.error(err))))
   }
+  db.getIdsFromResults(query, req.queryResults)
   // ONCE THE ABOVE IS DONE:
-  // cache.updateQueryCache(req.queryData)
-  // for songs in req.queryData
+  cache.updateQueryCache(query, req.queryResults)
+  // for songs in req.queryResults
     // send SNS of top songIds to Streaming
-  // for playlists in req.queryData
+  // for playlists in req.queryResults
     // send SNS of playlist Ids to AM
   // send SQS message to Events
 });

@@ -20,7 +20,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
     3. npm run elasticsearch
     4. npm run server
     5. npm run test
-    6. node faker/faker to generate fake data
+    6. npm run seed
 
 ## Usage
 

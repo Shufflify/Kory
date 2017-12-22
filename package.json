@@ -7,7 +7,8 @@
     "server": "nodemon server/index.js",
     "elasticsearch": "./elasticsearch-6.1.0/bin/elasticsearch",
     "redis": "redis-server ./config/redis.conf",
-    "test" : "mocha"
+    "test" : "mocha",
+    "seed" : "node db/seed"
   },
   "repository": {
     "type": "git",

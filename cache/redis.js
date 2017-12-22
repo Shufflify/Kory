@@ -48,7 +48,7 @@ const getDefaultPlaylistIds = () => {
 };
 
 const updatePlaylistCache = playlist => {
-  return Promise.resolve(pClient.hset('defaultPlaylists', playlist.id, playlist.songIds))
+  return Promise.resolve(pClient.hset('defaultPlaylists', playlist.id, playlist.songs))
     .then(reply => console.log(reply))
     .catch(err => console.error(err));
 };
@@ -59,16 +59,11 @@ const updateQueryCache = (query, queryResults) => {
   return Promise.resolve(qClient.hmset(query, 'playlists', playlistIds, 'songs', songIds));
 };
 
-const formatResultsForUser = queryResults => {
-
-}
-
 // updatePlaylistCache({id: 7, songIds: [4,7,2,34]}).then(res => console.log('RES',res));
 // getDefaultPlaylistIds().then(res => console.log(res));
 // checkPlaylists({params: {playlistId:5}}, {}, () => {})
 updateQueryCache('business', {playlistIds: [1,2,3,4], songIds: [5,6,7,8]}).then(res => console.log('RES', res))
 
-module.exports.formatResultsForUser = formatResultsForUser;
 module.exports.updatePlaylistCache = updatePlaylistCache;
 module.exports.updateQueryCache = updateQueryCache;
 module.exports.checkQueries = checkQueries;
