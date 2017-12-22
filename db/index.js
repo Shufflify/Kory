@@ -2,13 +2,11 @@ const elasticsearch = require('elasticsearch');
 
 const client = new elasticsearch.Client({
   host: 'localhost:9200',
-  log: 'trace'
+  // log: 'trace'
 });
 
-
-
 // create the playlists and songs indices
-const indices = ['playlists', 'songs'];
+// const indices = ['playlists', 'songs'];
 const createIdx = index => {
   // check if index already exists TODO
   client.indices.create({ index }, (err, resp, status) => {
@@ -20,25 +18,47 @@ const createIdx = index => {
   });
 };
 
-const basicSearch = q => client.search({ q }).then(results => console.log(results));
-const getPlaylists = playlistIds => {
-  let playlists = [];
-  for (id of playlistIds) {
-    client.get({
-      index: 'playlists',
-      type: 'playlist',
-      id: id
-    }, (err, resp) => {
-      console.log('RESPONSE', resp);
-      playlists.push(resp._source)
-      console.log('FIRST PLAYLIST', playlists)
+const basicSearch = q => client.search({ q }).then(res => res.hits.hits);
+const getPlaylist = id => {
+  let params = { index: 'playlists', type: 'playlist', id };
+  return new Promise((resolve, reject) => {
+    client.get(params, (err, playlist) => {
+      err ? reject(err) : resolve(playlist._source);
     });
-  }
-  console.log('PLAYLISTS', playlists);
-  // return playlists;
+  });
+};
+const getPlaylists = playlistIds => Promise.all(playlistIds.map(id => getPlaylist(id)));
+
+const getIdsFromResults = (query, queryResults) => {
+  let queryResultIds = { keyword: query, playlistIds: [], songIds: [] };
+  return queryResults.reduce((acc, result) => {
+    if (result._index === 'playlists') {
+      acc.playlistIds.push(result._id);
+    } else if (result._index === 'songs') {
+      acc.songIds.push(result._id);
+    }
+    return acc;
+  }, queryResultIds);
 };
 
-getPlaylists([1])
+const formatResultsForUser = queryResults => {
+  let userResults = { playlists: [], songs: [] };
+  return queryResults.reduce((acc, result) => {
+    if (result._index === 'playlists') {
+      acc.playlists.push(result._source);
+    } else if (result._index === 'songs') {
+      acc.songs.push(result._source);
+    }
+    return acc;
+  }, userResults);
+};
+// getPlaylists([8,4,5,6,33,5688]).then(res => console.log(res))
+// basicSearch('business').then(res => getIdsFromResults('business', res)).then(newRes => console.log(newRes));
+basicSearch('business').then(res => formatResultsForUser(res)).then(yea => console.log(yea))
+
+module.exports.formatResultsForUser = formatResultsForUser;
+module.exports.getIdsFromResults = getIdsFromResults;
+module.exports.getPlaylist = getPlaylist;
 module.exports.getPlaylists = getPlaylists;
 module.exports.basicSearch = basicSearch;
 module.exports.createIdx = createIdx;

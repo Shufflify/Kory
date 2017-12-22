@@ -14,7 +14,7 @@ app.get('/playlists/:userId', (req, res) => {
   // get user playlist data from AM
     .then(playlists => userPlaylists.concat(playlists.userPlaylists))
     .then(() => cache.getDefPlaylistIds()) // get default playlist ids from redis cache
-    .then(defPlaylistIds => db.getPlaylists())
+    .then(defaultPlaylistIds => db.getPlaylists())
     .then(defaultPlaylists => res.json({ userPlaylists, defaultPlaylists }))
 });
 
@@ -32,7 +32,7 @@ app.get('/playlists/:playlistId', cache.checkPlaylists(), (req, res) => {
         // playlist.songs = playlistData.songs
       })
   }
-  // cache.updatePlaylistCache(playlist)
+  cache.updatePlaylistCache(playlist)
 });
 
 // on search
@@ -41,8 +41,8 @@ app.get('/search/:userId/:query', cache.checkQueries(), (req, res) => {
   if (!req.queryData) {
     // TODO not sure if im using promise.resovle correctly
     Promise.resolve(db.basicSearch(query)
-      .then(queryData => {
-        req.queryData = queryData;
+      .then(searchResults => {
+        req.queryData = searchResults.hits.hits;
         res.json(queryData);
       })
       .catch(err => console.error(err)))

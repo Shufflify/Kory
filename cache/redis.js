@@ -15,7 +15,8 @@ const checkPlaylists = (req, res, next) => {
       if (err) throw err;
       if (songIds !== null) {
         req.songIds = songIds;
-        res.json(songIds); // TODO check formatting
+        console.log('songsIds',songIds)
+        // res.json(songIds); // TODO check formatting
       } 
     });
   }
@@ -24,43 +25,54 @@ const checkPlaylists = (req, res, next) => {
 
 const checkQueries = (req, res, next) => {
   const { query } = req.params;
-  qClient.get(query, (err, queryData) => {
+  qClient.get(query, (err, queryResults) => {
     if (err) throw err;
-    if (queryData !== null) {
-      req.queryData = queryData;
-      res.json(queryData); // TODO check Formatting
+    if (queryResults !== null) {
+      req.queryResults = queryResults;
+      res.json(queryResults); // TODO check Formatting
     }
   }).then(() => next());
 };
 
-const getDefPlaylistIds = () => {
-  pClient.hgetall('defaultPlaylists', (err, defPlaylists) => {
-    if (err) throw err;
-    let ids = [];
-    for (id in defPlaylists) {
-      ids.push(id);
-    }
-    return ids;
+const getDefaultPlaylistIds = () => {
+  return new Promise((resolve, reject) => {
+    pClient.hgetall('defaultPlaylists', (err, defPlaylists) => {
+      if (err) reject(err);
+      let ids = [];
+      for (id in defPlaylists) {
+        ids.push(id);
+      }
+      resolve(ids);
+    });
   });
 };
 
 const updatePlaylistCache = playlist => {
-  return Promise.resolve(pClient.hset('lruPlaylists', playlist.id, playlist.songIds))
+  return Promise.resolve(pClient.hset('defaultPlaylists', playlist.id, playlist.songIds))
     .then(reply => console.log(reply))
     .catch(err => console.error(err));
 };
 
-const updateQueryCache = queryData => {
+const updateQueryCache = (query, queryResults) => {
   // add queryData to cache
-  // const { playlists, songs } = queryData.keyword
-  // qClient.hmset('keyword', queryData.keyword, playlists, songs )
+  const { playlistIds, songIds } = queryResults;
+  return Promise.resolve(qClient.hmset(query, 'playlists', playlistIds, 'songs', songIds));
 };
 
+const formatResultsForUser = queryResults => {
+
+}
+
+// updatePlaylistCache({id: 7, songIds: [4,7,2,34]}).then(res => console.log('RES',res));
+// getDefaultPlaylistIds().then(res => console.log(res));
+// checkPlaylists({params: {playlistId:5}}, {}, () => {})
+updateQueryCache('business', {playlistIds: [1,2,3,4], songIds: [5,6,7,8]}).then(res => console.log('RES', res))
+
+module.exports.formatResultsForUser = formatResultsForUser;
 module.exports.updatePlaylistCache = updatePlaylistCache;
 module.exports.updateQueryCache = updateQueryCache;
 module.exports.checkQueries = checkQueries;
-module.exports.getDefPlaylistIds = getDefPlaylistIds;
-module.exports.updateCache = updateCache;
+module.exports.getDefaultPlaylistIds = getDefaultPlaylistIds;
 module.exports.pClient = pClient;
 module.exports.qClient = qClient;
 module.exports.checkPlaylists = checkPlaylists;
