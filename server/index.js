@@ -40,11 +40,11 @@ app.get('/search/:userId/:query', cache.checkQueries(), (req, res) => {
   const { userId, query } = req.params;
   if (!req.queryResults) {
     // TODO not sure if im using promise.resovle correctly
-    Promise.resolve(db.basicSearch(query)
+    db.basicSearch(query)
       .then(queryResults => req.queryResults = queryResults)
       .then(() => db.formatResultsForUser(req.queryResults)
       .then(formattedResults => res.json(formattedResults))
-      .catch(err => console.error(err))))
+      .catch(err => console.error(err)))
   }
   db.getIdsFromResults(query, req.queryResults)
   // ONCE THE ABOVE IS DONE:
