@@ -24,6 +24,7 @@
     "aws-sdk": "^2.173.0",
     "axios": "^0.17.1",
     "bluebird": "^3.5.1",
+    "dotenv": "^4.0.0",
     "elasticsearch": "^14.0.0",
     "express": "^4.16.2",
     "faker": "^4.1.0",

@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const AWS = require('aws-sdk');
+const aws = require('../helpers/aws.js');
 
 const db = require('../db');
 const cache = require('../cache');
@@ -11,7 +11,7 @@ const app = express();
 app.get('/playlists/:userId', (req, res) => {
   const { userId } = req.params;
   let userPlaylists = [];
-  // get user playlist data from AM
+  // get user playlist data from AM. make a separate get req? 
     .then(playlists => userPlaylists.concat(playlists.userPlaylists))
     .then(() => cache.getDefPlaylistIds()) // get default playlist ids from redis cache
     .then(defaultPlaylistIds => db.getPlaylists())
@@ -36,24 +36,21 @@ app.get('/playlists/:playlistId', cache.checkPlaylists(), (req, res) => {
 });
 
 // on search
-app.get('/search/:userId/:query', cache.checkQueries(), (req, res) => {
+app.get('/search/:userId/:query', cache.checkQueries(), async (req, res) => {
   const { userId, query } = req.params;
   if (!req.queryResults) {
-    // TODO not sure if im using promise.resovle correctly
-    db.basicSearch(query)
+    await db.basicSearch(query)
       .then(queryResults => req.queryResults = queryResults)
       .then(() => db.formatResultsForUser(req.queryResults)
       .then(formattedResults => res.json(formattedResults))
-      .catch(err => console.error(err)))
+      .catch(err => console.error(err))
   }
   db.getIdsFromResults(query, req.queryResults)
-  // ONCE THE ABOVE IS DONE:
   cache.updateQueryCache(query, req.queryResults)
-  // for songs in req.queryResults
-    // send SNS of top songIds to Streaming
-  // for playlists in req.queryResults
-    // send SNS of playlist Ids to AM
+  // send SNS of req.queryResults.songIds to Streaming
+  // send SNS of req.queryResults.playlistIds to AM
   // send SQS message to Events
+  aws.saveQuery(userId, query);
 });
 
 module.exports.app = app;
